@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+	
+	<bean id="propertyConfiguration" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	     <property name="location" value="/WEB-INF/config/jdbc.properties" />
+	</bean>	
+	
+	<bean id="basicDataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.user}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	
+	<bean name="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        <bean id="entityManagerFactoryBean" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+                <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
+                <property name="dataSource" ref="basicDataSource" />
+                <property name="persistenceUnitName" value="myJpaPersistenceUnit" />
+                <property name="packagesToScan">
+                  <list>
+                      <value>com.imran.repository</value>
+                  </list>
+                </property>         
+	        <property name="jpaProperties">
+		  <props>
+		     <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+		     <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+<!-- 		     <prop key="hibernate.id.new_generator_mappings">${hibernate.id.new_generator_mappings}</prop> -->
+		     <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+<!-- 		     <prop key="hibernate.format_sql">${hibernate.format_sql}</prop> -->			   
+		  </props>
+	        </property>
+	</bean>
+	
+	<bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+	    <property name="entityManagerFactory" ref="entityManagerFactoryBean" />
+	</bean>
+	<bean class="com.imran.dao.PostDao" />
+	<bean class="com.imran.dao.UserDao" />
+	<bean class="com.imran.dao.TestDao" />
+	<tx:annotation-driven transaction-manager="txManager" /> 
+	
+
+</beans>
